@@ -1,18 +1,35 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class BelowBrickCube : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    [SerializeField] private bool isThrough;
+    [SerializeField] private bool hasInitBrickParent;
+    [SerializeField] private new Renderer renderer;
+    public bool isSetColor;
+
+    public bool IsThrough
     {
-        
+        get => isThrough;
+        set => isThrough = value;
     }
 
-    // Update is called once per frame
-    void Update()
+    public bool HasInitBrickParent => hasInitBrickParent;
+
+    private void Start()
     {
-        
+        OnInit();
+    }
+
+    private void OnInit()
+    {
+        renderer = GetComponent<Renderer>();
+        var parent = transform.parent;
+        if (parent != null) hasInitBrickParent = parent.CompareTag("Brick");
+    }
+
+    public void SetNewColor()
+    {
+        isSetColor = true;
+        renderer.material.color = Color.cyan;
     }
 }

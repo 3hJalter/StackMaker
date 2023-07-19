@@ -1,18 +1,13 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Brick : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    [SerializeField] private BelowBrickCube belowBrickCube;
+    public bool holdByPlayer; // Temporary fix for double collision with player, remove when fixed
+    public void DetachBelowBrickCube()
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        if (belowBrickCube == null) return;
+        belowBrickCube.transform.parent = null;
+        belowBrickCube.IsThrough = true;
     }
 }
