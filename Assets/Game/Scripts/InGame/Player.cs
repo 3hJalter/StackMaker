@@ -84,8 +84,10 @@ public class Player : MonoBehaviour
 
     private void OnInit()
     {
-        cameraFollow.target = cameraTarget;
-        cameraFollow.yTargetPos = cameraTarget.position.y;
+        // cameraFollow.isGameComplete = false; // Change to GameManager when done testing with camera
+        // cameraFollow.isMovingCameraDone = false;
+        // cameraFollow.target = cameraTarget;
+        // cameraFollow.yTargetPos = cameraTarget.position.y;
         lastPosition = transform.position;
         firstBrick.DetachBelowBrickCube();
         _bricks2 = new Stack<Brick>();

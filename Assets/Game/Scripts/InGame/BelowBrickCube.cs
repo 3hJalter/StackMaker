@@ -30,6 +30,6 @@ public class BelowBrickCube : MonoBehaviour
     public void SetNewColor()
     {
         isSetColor = true;
-        renderer.material.color = Color.cyan;
+        renderer.material.color = Color.yellow;
     }
 }
