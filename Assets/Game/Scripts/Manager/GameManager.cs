@@ -10,7 +10,7 @@ public class GameManager : MonoSingleton<GameManager>
     [SerializeField] private Prefab prefab;
     [SerializeField] private GameObject player;
     [SerializeField] private TextAsset loadedLevelTextAsset;
-    [SerializeField] private List<GameObject> loadedPrefab;
+    [SerializeField] public List<GameObject> loadedPrefab;
 
     // For locate object
     [SerializeField] private Transform wallContainer;

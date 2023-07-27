@@ -1,6 +1,3 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class RoadN : MonoBehaviour
@@ -14,16 +11,19 @@ public class RoadN : MonoBehaviour
         if (render != null) render.material.color = Color.cyan;
     }
 
-    private void DetachBrickFromPlayer()
+    private void DetachBrickFromPlayer(PlayerN playerN)
     {
-        Debug.Log("Detach Brick");
+        if (!playerN.DetachBrick()) return;
+        isGoThrough = true;
+        SetNewColor();
     }
     
     private void OnTriggerEnter(Collider other)
     {
         if (isGoThrough) return;
         if (!other.CompareTag("Player")) return;
-        isGoThrough = true;
-        SetNewColor();
+        
+        DetachBrickFromPlayer(other.GetComponent<PlayerN>());
+        
     }
 }

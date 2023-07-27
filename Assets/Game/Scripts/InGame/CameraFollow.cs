@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-public class CameraFollow : MonoBehaviour
+public class CameraFollow : MonoSingleton<CameraFollow>
 {
     public Transform target;
     public float yTargetPos;

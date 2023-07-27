@@ -1,6 +1,4 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
+using System.Security.Cryptography;
 using UnityEngine;
 
 public class BrickN : MonoBehaviour
@@ -12,13 +10,15 @@ public class BrickN : MonoBehaviour
         if (_isAttach) return;
         if (other.CompareTag("Player"))
         {
-            AttachBrickToPlayer();
+            AttachBrickToPlayer(other.GetComponent<PlayerN>());
         }
     }
 
-    private void AttachBrickToPlayer()
+    private void AttachBrickToPlayer(PlayerN playerN)
     {
         _isAttach = true;
-        Debug.Log("Attach Brick");
+        // Change to pooling if need optimize
+        Destroy(gameObject);
+        playerN.AttachBrick();
     }
 }
