@@ -1,14 +1,8 @@
-﻿public enum LayerMaskEnum
+﻿public enum PlayerState
 {
-    Default = 0,
-    TransparentFX = 1,
-    IgnoreRaycast = 2,
-    Wall = 3,
-    Water = 4,
-    UI = 5,
-    BelowBrickCube = 6,
-    Brick = 7,
-    Player = 8
+    Idle = 0,
+    Collect = 1,
+    Victory = 2
 }
 
 public enum Direction
@@ -22,9 +16,15 @@ public enum Direction
 
 public enum ObjectType
 {
-    Wall = 0,
-    Brick = 1,
+    StartPoint = -2,
+    None = -1,
+    PivotWall = 0,
+    PivotBrick = 1,
     RoadNeedBrick = 2,
-    StartPoint = 3,
-    EndPoint = 4,
+    RoadNeedBrickRotate = 3,
+    Brick = 4,
+    Pivot = 5,
+    PivotCaro = 6,
+    PivotChess = 7,
+    PivotEndPoint = 8,
 }

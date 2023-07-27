@@ -5,6 +5,11 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : MonoSingleton<GameManager>
 {
+    public bool isEndGame;
+    // Win condition
+    public bool isWin;
+    public bool isReset;
+    
     [SerializeField] private int level;
     [SerializeField] private TextLevel textLevel;
     [SerializeField] private Prefab prefab;
@@ -18,28 +23,63 @@ public class GameManager : MonoSingleton<GameManager>
     [SerializeField] private Transform roadContainer;
 
     private Dictionary<int, Transform> _containerValue;
-
+    
     public int[][] GeneratedMatrix { get; private set; }
 
+    // Game data
+
+    public PlayerN Player { get; private set; }
+
+    private EndPoint _endPoint;
+    private List<RoadN> _roadNs;
+    private List<BrickN> _brickNs;
+    
     // Start is called before the first frame update
 
     protected override void Awake()
     {
         base.Awake();
+        OnInit();
+        level = PlayerPrefs.GetInt("level");
+    }
+
+    private void OnInit()
+    {
+        // Reset bool value
+        isEndGame = false;
+        isWin = false;
         _containerValue = new Dictionary<int, Transform>
         {
-            { (int)ObjectType.Wall, wallContainer },
-            { (int)ObjectType.Brick, brickContainer },
-            { (int)ObjectType.RoadNeedBrick, roadContainer }
+            { (int)ObjectType.PivotWall, wallContainer },
+            { (int)ObjectType.PivotCaro, wallContainer },
+            { (int)ObjectType.Pivot, wallContainer },
+            { (int)ObjectType.PivotEndPoint, wallContainer },
+            { (int)ObjectType.PivotChess, wallContainer },
+            { (int)ObjectType.PivotBrick, brickContainer },
+            { (int)ObjectType.RoadNeedBrick, roadContainer },
+            { (int)ObjectType.RoadNeedBrickRotate, roadContainer},
         };
-        loadedLevelTextAsset = textLevel.levelText[level];
-        loadedPrefab = prefab.prefab;
-        GeneratedMatrix = GenerateMap();
+        // Setup map
+        if (isReset) OnResetLevel();
+        else
+        {
+            if (level >= textLevel.levelText.Count)
+            {
+                level = 0;
+                PlayerPrefs.SetInt("level", level);
+            }
+            OnLoadNewLevel();
+        }
+        CameraFollow.Instance.OnInit(Player);
     }
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.R)) SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            // isReset = true;
+            OnInit();
+        };
     }
 
     private int[][] GenerateMap()
@@ -57,22 +97,45 @@ public class GameManager : MonoSingleton<GameManager>
                 switch (cellValue)
                 {
                     case (int) ObjectType.StartPoint:
-                        Instantiate(loadedPrefab[(int) ObjectType.Brick], 
-                                new Vector3(j, 0, i), Quaternion.identity)
-                            .transform.SetParent(brickContainer);
-                        Instantiate(player, 
-                            new Vector3(j, 0, i), Quaternion.identity);
+                        var brickStart = Instantiate(loadedPrefab[(int) ObjectType.PivotBrick], 
+                                new Vector3(j, 0, i), Quaternion.identity);
+                        brickStart.transform.SetParent(_containerValue[(int) ObjectType.PivotBrick]);
+                        _brickNs.Add(brickStart.GetComponentInChildren<BrickN>());
+                        Player = Instantiate(player, 
+                            new Vector3(j, 0, i), Quaternion.identity).GetComponent<PlayerN>();
                         break;
-                    case (int) ObjectType.EndPoint:
-                        Instantiate(loadedPrefab[(int) ObjectType.Brick], 
-                                new Vector3(j, 1, i), Quaternion.identity)
-                            .transform.SetParent(brickContainer);
+                    case (int) ObjectType.PivotEndPoint:
+                        _endPoint = Instantiate(loadedPrefab[(int)ObjectType.PivotEndPoint],
+                            new Vector3(j, 0, i), Quaternion.identity).GetComponent<EndPoint>();
                         break;
-                    case (int) ObjectType.Wall:
-                    case (int) ObjectType.Brick:
-                    case (int) ObjectType.RoadNeedBrick:
+                    case (int) ObjectType.Pivot:
+                    case (int) ObjectType.PivotCaro:
+                    case (int) ObjectType.PivotWall:
                         Instantiate(loadedPrefab[cellValue], 
                                 new Vector3(j, 0, i), Quaternion.identity)
+                            .transform.SetParent(_containerValue[cellValue]);
+                        // ObjectPool.Instance.Spawn(loadedPrefab[cellValue].tag);
+                        break;
+                    case (int) ObjectType.PivotBrick:
+                        var brick = Instantiate(loadedPrefab[cellValue], 
+                                new Vector3(j, 0, i), Quaternion.identity);
+                        brick.transform.SetParent(_containerValue[cellValue]);
+                        _brickNs.Add(brick.GetComponentInChildren<BrickN>());
+                        // ObjectPool.Instance.Spawn(loadedPrefab[cellValue].tag);
+                        break;
+                    case (int) ObjectType.RoadNeedBrick:
+                    case (int) ObjectType.RoadNeedBrickRotate:
+                        var road = Instantiate(loadedPrefab[cellValue],
+                            new Vector3(j, 0, i), Quaternion.identity);
+                        road.transform.SetParent(_containerValue[cellValue]);
+                        var roadN = road.GetComponent<RoadN>();
+                        _roadNs.Add(roadN);
+                        // ObjectPool.Instance.Spawn(loadedPrefab[cellValue].tag);
+                        break;
+                    case (int) ObjectType.PivotChess:
+                        // Temp Fix
+                        Instantiate(loadedPrefab[cellValue], 
+                                new Vector3(j, 0, i), Quaternion.Euler(new Vector3(0, -90, 0)))
                             .transform.SetParent(_containerValue[cellValue]);
                         // ObjectPool.Instance.Spawn(loadedPrefab[cellValue].tag);
                         break;
@@ -80,8 +143,69 @@ public class GameManager : MonoSingleton<GameManager>
                 matrix[i][j] = cellValue;
             }
         }
-
+        Debug.Log(_brickNs.Count);
+        Debug.Log(_roadNs.Count);
         return matrix;
     }
 
+    public void OnWin()
+    {
+        isWin = true;
+        CameraFollow.Instance.isChangeCamera = true;
+        level++;
+        PlayerPrefs.SetInt("level", level);
+        // OnInit();
+    }
+
+    public void OnLose()
+    {
+        isReset = true;
+        // Reset game logic
+        Debug.Log("Lose");
+        // OnInit();
+    }
+
+    private void RemoveData()
+    {
+        // Wrong logic, root is brick container and road container
+        foreach (var brick in _brickNs)
+        {
+            Destroy(brick.transform.gameObject);
+        }
+        _brickNs.Clear();
+        foreach (var road in _roadNs)
+        {
+            Destroy(road.transform.gameObject);
+        }
+        _roadNs.Clear();
+        Destroy(Player.gameObject);
+        Destroy(_endPoint.gameObject);
+        
+    }
+    
+    private void OnLoadNewLevel()
+    {
+        // Remove Old Data
+        if ((_roadNs != null && _roadNs.Count != 0) || (_brickNs != null && _brickNs.Count != 0)) RemoveData();
+        // Setting new Data
+        _brickNs = new List<BrickN>();
+        _roadNs = new List<RoadN>();
+        loadedLevelTextAsset = textLevel.levelText[level];
+        loadedPrefab = prefab.prefab;
+        GeneratedMatrix = GenerateMap();
+        Debug.Log("Load New Level");
+    }
+
+    private void OnResetLevel()
+    {
+        isReset = false;
+        Player.transform.position = Player.InitPos;
+        Player.OnInit();
+        _endPoint.OnInit();
+        foreach (var road in _roadNs)
+            road.OnInit();
+        foreach (var brick in _brickNs)
+            brick.OnInit();
+        Debug.Log("Restart Level");
+    }
 }
