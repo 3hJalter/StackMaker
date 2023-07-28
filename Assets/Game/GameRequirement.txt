@@ -1,0 +1,13 @@
+-- Thay model = assets -> Done
+-- Sửa logic nhận horizontal và vertical từ mouse -> Done
+-- Thêm logic Camera -> Done
+-- Thêm logic Check Trigger cho Brick và Road -> Done
+-- Thêm logic End point + Camera khi End point -> Done
+-- Thêm UI -> Done (hơi xấu, rảnh thì thay asset mới + effect UI)
+-- Restart game, Next level -> Done
+-- Thêm music -- Kiếm nhạc rồi tăng giảm pitch tuỳ theo Stack.Count
+-- Thêm background -> Done
+
+-- Optional --
+-- Object Pooling
+-- Change Direction Object (cái cục đổi hướng tím tím, sửa lại script đã viết trước đấy là xong)
