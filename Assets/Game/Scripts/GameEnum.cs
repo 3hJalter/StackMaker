@@ -27,4 +27,7 @@ public enum ObjectType
     PivotCaro = 6,
     PivotChess = 7,
     PivotEndPoint = 8,
+    RoadNeedBrickNone = 9,
+    RoadNeedBrickExpand = 10,
+    RoadNeedBrickExpandRotate = 11,
 }

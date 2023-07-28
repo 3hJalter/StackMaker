@@ -13,7 +13,7 @@ public class RoadN : MonoBehaviour
         SetNewColor(new Color(0.7f, 0.6f, 1f, 1f));
     }
     
-    private void SetNewColor(Color color)
+    protected virtual void SetNewColor(Color color)
     {
         if (render != null) render.material.color = color;
     }
@@ -26,7 +26,7 @@ public class RoadN : MonoBehaviour
         yellowRoad.SetActive(true);
     }
     
-    private void OnTriggerEnter(Collider other)
+    protected void OnTriggerEnter(Collider other)
     {
         if (isGoThrough) return;
         if (!other.CompareTag("Player")) return;

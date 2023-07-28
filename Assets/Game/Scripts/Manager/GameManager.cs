@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using Game.ScriptableObjects.Editor;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class GameManager : MonoSingleton<GameManager>
 {
@@ -11,6 +10,9 @@ public class GameManager : MonoSingleton<GameManager>
     public bool isReset;
     
     [SerializeField] private int level;
+
+    public int Level => level;
+
     [SerializeField] private TextLevel textLevel;
     [SerializeField] private Prefab prefab;
     [SerializeField] private GameObject player;
@@ -23,13 +25,28 @@ public class GameManager : MonoSingleton<GameManager>
     [SerializeField] private Transform roadContainer;
 
     private Dictionary<int, Transform> _containerValue;
+
+    private readonly List<Color> _colors = new()
+    {
+        new Color(1,0,0),
+        new Color(1, 0.5f, 0),
+        new Color(1,1,0),
+        new Color(0.25f,1,0),
+        new Color(0,1, 1),
+        new Color(0,0,1),
+        new Color(0.5f,0,1),
+        new Color(1,0,1),
+    };
+    // if want constant color for each level, set _countColor = 0 on init
+    private int _countColor;
     
     public int[][] GeneratedMatrix { get; private set; }
 
     // Game data
 
-    public PlayerN Player { get; private set; }
+    private PlayerN Player { get; set; }
 
+    private ChessOpen _chess;
     private EndPoint _endPoint;
     private List<RoadN> _roadNs;
     private List<BrickN> _brickNs;
@@ -43,7 +60,7 @@ public class GameManager : MonoSingleton<GameManager>
         level = PlayerPrefs.GetInt("level");
     }
 
-    private void OnInit()
+    public void OnInit()
     {
         // Reset bool value
         isEndGame = false;
@@ -58,6 +75,9 @@ public class GameManager : MonoSingleton<GameManager>
             { (int)ObjectType.PivotBrick, brickContainer },
             { (int)ObjectType.RoadNeedBrick, roadContainer },
             { (int)ObjectType.RoadNeedBrickRotate, roadContainer},
+            { (int)ObjectType.RoadNeedBrickNone, roadContainer},
+            { (int)ObjectType.RoadNeedBrickExpand, roadContainer},
+            { (int)ObjectType.RoadNeedBrickExpandRotate, roadContainer},
         };
         // Setup map
         if (isReset) OnResetLevel();
@@ -70,6 +90,8 @@ public class GameManager : MonoSingleton<GameManager>
             }
             OnLoadNewLevel();
         }
+        UIManager.Instance.OnInit();
+        StartCoroutine(UIManager.Instance.ScaleUpWaitBg());
         CameraFollow.Instance.OnInit(Player);
     }
 
@@ -78,8 +100,8 @@ public class GameManager : MonoSingleton<GameManager>
         if (Input.GetKeyDown(KeyCode.R))
         {
             // isReset = true;
-            OnInit();
-        };
+            StartCoroutine(UIManager.Instance.ScaleDownWaitBg());
+        }
     }
 
     private int[][] GenerateMap()
@@ -125,6 +147,7 @@ public class GameManager : MonoSingleton<GameManager>
                         break;
                     case (int) ObjectType.RoadNeedBrick:
                     case (int) ObjectType.RoadNeedBrickRotate:
+                    case (int) ObjectType.RoadNeedBrickNone:
                         var road = Instantiate(loadedPrefab[cellValue],
                             new Vector3(j, 0, i), Quaternion.identity);
                         road.transform.SetParent(_containerValue[cellValue]);
@@ -132,11 +155,24 @@ public class GameManager : MonoSingleton<GameManager>
                         _roadNs.Add(roadN);
                         // ObjectPool.Instance.Spawn(loadedPrefab[cellValue].tag);
                         break;
+                    case (int) ObjectType.RoadNeedBrickExpand:
+                    case (int) ObjectType.RoadNeedBrickExpandRotate:
+                        var roadExpand = Instantiate(loadedPrefab[cellValue],
+                            new Vector3(j, 0, i), Quaternion.identity);
+                        roadExpand.transform.SetParent(_containerValue[cellValue]);
+                        var roadExpandN = roadExpand.GetComponent<RoadExpand>();
+                        if (_countColor >= _colors.Count) _countColor = 0;
+                        roadExpandN.lineColor = _colors[_countColor];
+                        _countColor++;
+                        _roadNs.Add(roadExpandN);
+                        // ObjectPool.Instance.Spawn(loadedPrefab[cellValue].tag);
+                        break;
                     case (int) ObjectType.PivotChess:
                         // Temp Fix
-                        Instantiate(loadedPrefab[cellValue], 
-                                new Vector3(j, 0, i), Quaternion.Euler(new Vector3(0, -90, 0)))
-                            .transform.SetParent(_containerValue[cellValue]);
+                        var chest = Instantiate(loadedPrefab[cellValue],
+                            new Vector3(j, 0, i), Quaternion.Euler(new Vector3(0, -90, 0)));
+                        chest.transform.SetParent(_containerValue[cellValue]);
+                        _chess = chest.GetComponent<ChessOpen>();
                         // ObjectPool.Instance.Spawn(loadedPrefab[cellValue].tag);
                         break;
                 }
@@ -152,6 +188,9 @@ public class GameManager : MonoSingleton<GameManager>
     {
         isWin = true;
         CameraFollow.Instance.isChangeCamera = true;
+        UIManager.Instance.restartButton.gameObject.SetActive(false);
+        UIManager.Instance.settingButton.gameObject.SetActive(false);
+        UIManager.Instance.LevelText.gameObject.SetActive(false);
         level++;
         PlayerPrefs.SetInt("level", level);
         // OnInit();
@@ -162,7 +201,7 @@ public class GameManager : MonoSingleton<GameManager>
         isReset = true;
         // Reset game logic
         Debug.Log("Lose");
-        // OnInit();
+        StartCoroutine(UIManager.Instance.ScaleDownWaitBg());
     }
 
     private void RemoveData()
@@ -180,7 +219,7 @@ public class GameManager : MonoSingleton<GameManager>
         _roadNs.Clear();
         Destroy(Player.gameObject);
         Destroy(_endPoint.gameObject);
-        
+        Destroy(_chess.gameObject);
     }
     
     private void OnLoadNewLevel()
@@ -202,10 +241,12 @@ public class GameManager : MonoSingleton<GameManager>
         Player.transform.position = Player.InitPos;
         Player.OnInit();
         _endPoint.OnInit();
+        _chess.OnInit();
         foreach (var road in _roadNs)
             road.OnInit();
         foreach (var brick in _brickNs)
             brick.OnInit();
         Debug.Log("Restart Level");
     }
+    
 }

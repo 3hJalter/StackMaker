@@ -133,7 +133,8 @@ public class PlayerN : MonoBehaviour
             // Need lose coupling 
             if (mapValue is (int)ObjectType.PivotBrick or (int)ObjectType.RoadNeedBrick or (int) ObjectType.Pivot
                 or (int) ObjectType.RoadNeedBrickRotate or (int)ObjectType.StartPoint or (int)ObjectType.PivotEndPoint
-                or (int) ObjectType.PivotCaro)
+                or (int) ObjectType.PivotCaro or (int) ObjectType.RoadNeedBrickNone or (int) ObjectType.RoadNeedBrickExpand 
+                or (int) ObjectType.RoadNeedBrickExpandRotate )
                 continue;
             destination -= direction;
             return;

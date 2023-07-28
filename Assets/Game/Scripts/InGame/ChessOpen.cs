@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class ChessOpen : MonoBehaviour
@@ -7,6 +6,13 @@ public class ChessOpen : MonoBehaviour
     private bool _isOpen;
     [SerializeField] private GameObject chessClose;
     [SerializeField] private GameObject chessOpen;
+
+    public void OnInit()
+    {
+        _isOpen = false;
+        chessClose.SetActive(true);
+        chessOpen.SetActive(false);
+    }
     private void OnTriggerEnter(Collider other)
     {
         if (_isOpen) return;

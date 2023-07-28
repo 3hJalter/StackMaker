@@ -27,8 +27,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1969862712047478950}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0.8}
-  m_LocalScale: {x: 1, y: 0.7, z: 0.6}
+  m_LocalPosition: {x: 1, y: 0, z: 0.8}
+  m_LocalScale: {x: 3, y: 0.7, z: 0.6}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2979273516556280657}
@@ -62,7 +62,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 6007c1c332562174ea4ac7d4b4d129ed, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -124,8 +124,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3918483535681500355}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -0.8}
-  m_LocalScale: {x: 1, y: 0.7, z: 0.6}
+  m_LocalPosition: {x: 1, y: 0, z: -0.8}
+  m_LocalScale: {x: 3, y: 0.7, z: 0.6}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2979273516556280657}
@@ -159,7 +159,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 6007c1c332562174ea4ac7d4b4d129ed, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -203,10 +203,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5691990970283414698}
-  - component: {fileID: 3780377880716996791}
   - component: {fileID: 992545112361312453}
+  - component: {fileID: -7908280024386390478}
   m_Layer: 6
-  m_Name: RoadNeedBrickRotate
+  m_Name: RoadNeedBrickExpandRotate
   m_TagString: BelowBrickCube
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -224,26 +224,11 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 2979273516556280657}
   - {fileID: 6154655268460970878}
+  - {fileID: 2979273516556280657}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &3780377880716996791
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5691990970283414699}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c75a0431430502f4894b77e029ca7bdb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  isGoThrough: 0
-  yellowRoad: {fileID: 6153541979114227290}
-  render: {fileID: 6139702221690728392}
 --- !u!65 &992545112361312453
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -257,6 +242,24 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &-7908280024386390478
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5691990970283414699}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a9ec960d70030694095a867ca37d8c0e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isGoThrough: 0
+  yellowRoad: {fileID: 6153541979114227290}
+  render: {fileID: 6139702221690728392}
+  lineLeft: {fileID: 6123208592476692409}
+  lineRight: {fileID: 4216063012638263162}
+  lineColor: {r: 0.75, g: 0.25, b: 0, a: 0}
 --- !u!1 &7130675768549094392
 GameObject:
   m_ObjectHideFlags: 0
@@ -288,7 +291,7 @@ Transform:
   - {fileID: 1728636206638746472}
   - {fileID: 1129562207109860113}
   m_Father: {fileID: 5691990970283414698}
-  m_RootOrder: 0
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
 --- !u!1001 &6153719996171964153
 PrefabInstance:
@@ -307,7 +310,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4466079004233095, guid: d04d393ce76715f498cdd8615b8940a4, type: 3}
       propertyPath: m_RootOrder
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4466079004233095, guid: d04d393ce76715f498cdd8615b8940a4, type: 3}
       propertyPath: m_LocalPosition.x
