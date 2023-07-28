@@ -1,4 +1,16 @@
-﻿public enum PlayerState
+﻿public enum Screen
+{
+    MainScreen = 0,
+    InGameScreen = 1,
+    VictoryScreen = 2,
+}
+
+public enum Popup
+{
+    SettingPopup = 0,
+}
+
+public enum PlayerState
 {
     Idle = 0,
     Collect = 1,

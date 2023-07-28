@@ -1,9 +1,11 @@
 using System.Collections.Generic;
 using Game.ScriptableObjects.Editor;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class GameManager : MonoSingleton<GameManager>
 {
+    public bool isInGameRunning;
     public bool isEndGame;
     // Win condition
     public bool isWin;
@@ -11,7 +13,11 @@ public class GameManager : MonoSingleton<GameManager>
     
     [SerializeField] private int level;
 
-    public int Level => level;
+    public int Level
+    {
+        get => level;
+        set => level = value;
+    }
 
     [SerializeField] private TextLevel textLevel;
     [SerializeField] private Prefab prefab;
@@ -81,15 +87,7 @@ public class GameManager : MonoSingleton<GameManager>
         };
         // Setup map
         if (isReset) OnResetLevel();
-        else
-        {
-            if (level >= textLevel.levelText.Count)
-            {
-                level = 0;
-                PlayerPrefs.SetInt("level", level);
-            }
-            OnLoadNewLevel();
-        }
+        else OnLoadNewLevel();
         UIManager.Instance.OnInit();
         StartCoroutine(UIManager.Instance.ScaleUpWaitBg());
         CameraFollow.Instance.OnInit(Player);
@@ -101,6 +99,7 @@ public class GameManager : MonoSingleton<GameManager>
         {
             // isReset = true;
             StartCoroutine(UIManager.Instance.ScaleDownWaitBg());
+            // OnInit();
         }
     }
 
@@ -188,10 +187,8 @@ public class GameManager : MonoSingleton<GameManager>
     {
         isWin = true;
         CameraFollow.Instance.isChangeCamera = true;
-        UIManager.Instance.restartButton.gameObject.SetActive(false);
-        UIManager.Instance.settingButton.gameObject.SetActive(false);
-        UIManager.Instance.LevelText.gameObject.SetActive(false);
         level++;
+        if (level >= textLevel.levelText.Count) level = 0;
         PlayerPrefs.SetInt("level", level);
         // OnInit();
     }
@@ -248,5 +245,4 @@ public class GameManager : MonoSingleton<GameManager>
             brick.OnInit();
         Debug.Log("Restart Level");
     }
-    
 }

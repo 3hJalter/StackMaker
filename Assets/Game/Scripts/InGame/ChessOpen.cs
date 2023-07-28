@@ -19,6 +19,7 @@ public class ChessOpen : MonoBehaviour
         if (!other.CompareTag("Player")) return;
         _isOpen = true;
         StartCoroutine(OpenChess(other.GetComponent<PlayerN>()));
+        StartCoroutine(ShowVictoryScreen());
     }
 
     private IEnumerator OpenChess(PlayerN playerN)
@@ -27,5 +28,11 @@ public class ChessOpen : MonoBehaviour
         chessClose.SetActive(false);
         chessOpen.SetActive(true);
         playerN.ChangeAnim(PlayerState.Victory);
+    }
+    
+    private IEnumerator ShowVictoryScreen()
+    {
+        yield return new WaitForSeconds(2.5f);
+        UIManager.Instance.currentScreen.ChangeScreen(Screen.VictoryScreen);
     }
 }

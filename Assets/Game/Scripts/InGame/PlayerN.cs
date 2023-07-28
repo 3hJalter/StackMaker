@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -42,6 +43,7 @@ public class PlayerN : MonoBehaviour
     // Update is called once per frame
     private void Update()
     {
+        if (!GameManager.Instance.isInGameRunning) return;
         if (_currentAnim == Enum.GetName(PlayerState.Victory.GetType(), PlayerState.Victory)) return;
         if (isMoving)
         {
@@ -171,6 +173,7 @@ public class PlayerN : MonoBehaviour
             {
                 ChangeAnim(PlayerState.Victory);
                 Debug.Log("Win");
+                StartCoroutine(ShowVictoryScreen());
             }
             else
             {
@@ -200,5 +203,11 @@ public class PlayerN : MonoBehaviour
         animator.ResetTrigger(animName);
         _currentAnim = animName;
         animator.SetTrigger(_currentAnim);
+    }
+
+    private IEnumerator ShowVictoryScreen()
+    {
+        yield return new WaitForSeconds(2.5f);
+        UIManager.Instance.currentScreen.ChangeScreen(Screen.VictoryScreen);
     }
 }

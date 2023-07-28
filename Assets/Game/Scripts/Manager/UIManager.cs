@@ -1,19 +1,29 @@
 using System.Collections;
+using System.Collections.Generic;
+using Game.ScriptableObjects.Editor;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class UIManager : MonoSingleton<UIManager>
 {
-    [SerializeField] public Button settingButton;
-    [SerializeField] public Button restartButton;
-    [SerializeField] private Text levelText;
 
-    public Text LevelText
-    {
-        get => levelText;
-        set => levelText = value;
-    }
+    // Screen container
+    [SerializeField] private Transform screenContainer;
+    [SerializeField] private Transform popupContainer;
+    public Transform ScreenContainer => screenContainer;
+    public Transform PopupContainer => popupContainer;
+    // Screen List
+    [SerializeField] private ScreenUI screenUI;
+    public Dictionary<Screen, GameObject> ScreenObject { get; private set; }
+    public BaseScreen currentScreen;
+    public ScreenUI ScreenUI => screenUI;
 
+    // Popup List 
+    [SerializeField] private PopupUI popupUI;
+    public Dictionary<Popup, GameObject> PopupObject { get; private set; }
+    public PopupUI PopupUI => popupUI;
+    
+    
     [SerializeField] private Image waitBg;
     // Start is called before the first frame update
     private const float MinScaleWaitBg = 0.2f;
@@ -21,16 +31,26 @@ public class UIManager : MonoSingleton<UIManager>
 
     private void Start()
     {
+        OnInitOne();
         OnInit();
     }
 
+    private void OnInitOne()
+    {
+        ScreenObject = new Dictionary<Screen, GameObject>();
+        PopupObject = new Dictionary<Popup, GameObject>();
+        var screen = screenUI.screenList[(int) Screen.MainScreen];
+        ScreenObject.Add(Screen.MainScreen, screen.CreateScreen());
+        currentScreen = ScreenObject[Screen.MainScreen].GetComponent<BaseScreen>();
+    }
+    
     public void OnInit()
     {
-        settingButton.gameObject.SetActive(true);
-        restartButton.gameObject.SetActive(true);
-        levelText.gameObject.SetActive(true);
         waitBg.gameObject.SetActive(true);
-        levelText.text = "LEVEL " + GameManager.Instance.Level;
+        if (currentScreen is MainScreen or InGameScreen)
+        {
+            currentScreen.LevelText.text = "LEVEL " + GameManager.Instance.Level;
+        }
     }
 
     public IEnumerator ScaleUpWaitBg()
@@ -48,12 +68,14 @@ public class UIManager : MonoSingleton<UIManager>
             if (!(waitBg.rectTransform.localScale.x >= MaxScaleWaitBg)) continue;
             waitBg.rectTransform.localScale = Vector3.one * MaxScaleWaitBg;
             waitBg.gameObject.SetActive(false);
+            GameManager.Instance.isInGameRunning = currentScreen is InGameScreen;
             yield return null;
         }
     }
     
     public IEnumerator ScaleDownWaitBg()
     {
+        GameManager.Instance.isInGameRunning = false;
         waitBg.gameObject.SetActive(true);
         var time = 1f;
         const float offset = MaxScaleWaitBg - MinScaleWaitBg;
@@ -68,15 +90,10 @@ public class UIManager : MonoSingleton<UIManager>
             yield return null;
         }
     }
-    
-    public void OnClickSetting()
-    {
-        Debug.Log("Click Setting button");
-    }
 
-    public void OnClickRestart()
+
+    public void ShowWaitBg()
     {
-        GameManager.Instance.isReset = true;
         StartCoroutine(ScaleDownWaitBg());
     }
 }
