@@ -22,7 +22,9 @@ public class VictoryScreen : BaseScreen
     public void OnRestartLevelButton()
     {
         if (GameManager.Instance.Level != 0) GameManager.Instance.Level -= 1;
+        else GameManager.Instance.Level = GameManager.Instance.TextLevel.levelText.Count - 1;
         PlayerPrefs.SetInt("level", GameManager.Instance.Level);
+        GameManager.Instance.isReset = true;
         ChangeScreen(Screen.InGameScreen);
         UIManager.Instance.ShowWaitBg();
         

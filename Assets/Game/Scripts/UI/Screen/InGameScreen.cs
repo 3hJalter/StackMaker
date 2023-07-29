@@ -41,4 +41,18 @@ public class InGameScreen : BaseScreen
         GameManager.Instance.isReset = true;
         UIManager.Instance.ShowWaitBg();
     }
+
+    public override void HideComponents()
+    {
+        base.HideComponents();
+        settingButton.SetActive(false);
+        restartButton.SetActive(false);
+    }
+
+    public override void ShowComponent()
+    {
+        base.ShowComponent();
+        settingButton.SetActive(true);
+        restartButton.SetActive(true);
+    }
 }

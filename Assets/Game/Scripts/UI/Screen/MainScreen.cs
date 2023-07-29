@@ -23,4 +23,16 @@ public class MainScreen : BaseScreen
         ChangeScreen(Screen.InGameScreen);
         GameManager.Instance.isInGameRunning = true;
     }
+
+    public override void HideComponents()
+    {
+        base.HideComponents();
+        playButton.SetActive(false);
+    }
+
+    public override void ShowComponent()
+    {
+        base.ShowComponent();
+        playButton.SetActive(true);
+    }
 }

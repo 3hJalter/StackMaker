@@ -49,5 +49,14 @@ public class BaseScreen : MonoBehaviour
     {
         Debug.Log("Do something when disable screen");
     }
-    
+
+    public virtual void HideComponents()
+    {
+        levelText.gameObject.SetActive(false);
+    }
+
+    public virtual void ShowComponent()
+    {
+        levelText.gameObject.SetActive(true);
+    }
 }

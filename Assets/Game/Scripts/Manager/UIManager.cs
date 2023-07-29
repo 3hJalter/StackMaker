@@ -55,6 +55,7 @@ public class UIManager : MonoSingleton<UIManager>
 
     public IEnumerator ScaleUpWaitBg()
     {
+        if (currentScreen != null) currentScreen.ShowComponent();
         if (Mathf.Abs(waitBg.rectTransform.localScale.x - MaxScaleWaitBg) < 0.01f) yield return null;
         waitBg.gameObject.SetActive(true);
         waitBg.rectTransform.localScale = Vector3.one * MinScaleWaitBg;
@@ -75,6 +76,7 @@ public class UIManager : MonoSingleton<UIManager>
     
     public IEnumerator ScaleDownWaitBg()
     {
+        currentScreen.HideComponents();
         GameManager.Instance.isInGameRunning = false;
         waitBg.gameObject.SetActive(true);
         var time = 1f;

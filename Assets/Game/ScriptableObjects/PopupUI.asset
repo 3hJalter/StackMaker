@@ -12,4 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fdd726685017f8849bd9680a6f957c55, type: 3}
   m_Name: PopupUI
   m_EditorClassIdentifier: 
-  popupList: []
+  popupList:
+  - {fileID: 3289994657370118811, guid: 9499c8a8b5ed2d349b8186a3649b1250, type: 3}

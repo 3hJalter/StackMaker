@@ -198,7 +198,8 @@ public class PlayerN : MonoBehaviour
 
     public void ChangeAnim(PlayerState state)
     {
-        var animName = Enum.GetName(state.GetType(), state);
+        // var animName = Enum.GetName(state.GetType(), state);
+        var animName = state.ToString();
         // if (_currentAnim == animName) return;
         animator.ResetTrigger(animName);
         _currentAnim = animName;

@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using Game.ScriptableObjects.Editor;
 using UnityEngine;
 using UnityEngine.Serialization;
-
+public  enum  GameState{ MainMenu = 0, GamePlay = 1, Finish = 3}
 public class GameManager : MonoSingleton<GameManager>
 {
     public bool isInGameRunning;
@@ -20,6 +20,9 @@ public class GameManager : MonoSingleton<GameManager>
     }
 
     [SerializeField] private TextLevel textLevel;
+
+    public TextLevel TextLevel => textLevel;
+
     [SerializeField] private Prefab prefab;
     [SerializeField] private GameObject player;
     [SerializeField] private TextAsset loadedLevelTextAsset;
@@ -56,14 +59,16 @@ public class GameManager : MonoSingleton<GameManager>
     private EndPoint _endPoint;
     private List<RoadN> _roadNs;
     private List<BrickN> _brickNs;
+    private List<GameObject> _walls;
     
     // Start is called before the first frame update
 
     protected override void Awake()
     {
+        Application.targetFrameRate = 60;
         base.Awake();
-        OnInit();
         level = PlayerPrefs.GetInt("level");
+        OnInit();
     }
 
     public void OnInit()
@@ -132,9 +137,10 @@ public class GameManager : MonoSingleton<GameManager>
                     case (int) ObjectType.Pivot:
                     case (int) ObjectType.PivotCaro:
                     case (int) ObjectType.PivotWall:
-                        Instantiate(loadedPrefab[cellValue], 
-                                new Vector3(j, 0, i), Quaternion.identity)
-                            .transform.SetParent(_containerValue[cellValue]);
+                        var wall = Instantiate(loadedPrefab[cellValue],
+                            new Vector3(j, 0, i), Quaternion.identity);
+                        wall.transform.SetParent(_containerValue[cellValue]);
+                        _walls.Add(wall);
                         // ObjectPool.Instance.Spawn(loadedPrefab[cellValue].tag);
                         break;
                     case (int) ObjectType.PivotBrick:
@@ -186,6 +192,7 @@ public class GameManager : MonoSingleton<GameManager>
     public void OnWin()
     {
         isWin = true;
+        UIManager.Instance.currentScreen.HideComponents();
         CameraFollow.Instance.isChangeCamera = true;
         level++;
         if (level >= textLevel.levelText.Count) level = 0;
@@ -196,6 +203,7 @@ public class GameManager : MonoSingleton<GameManager>
     public void OnLose()
     {
         isReset = true;
+        UIManager.Instance.currentScreen.HideComponents();
         // Reset game logic
         Debug.Log("Lose");
         StartCoroutine(UIManager.Instance.ScaleDownWaitBg());
@@ -203,6 +211,11 @@ public class GameManager : MonoSingleton<GameManager>
 
     private void RemoveData()
     {
+        foreach (var wall in _walls)
+        {
+            Destroy(wall);
+        }
+        _walls.Clear();
         // Wrong logic, root is brick container and road container
         foreach (var brick in _brickNs)
         {
@@ -222,10 +235,13 @@ public class GameManager : MonoSingleton<GameManager>
     private void OnLoadNewLevel()
     {
         // Remove Old Data
-        if ((_roadNs != null && _roadNs.Count != 0) || (_brickNs != null && _brickNs.Count != 0)) RemoveData();
+        if ((_roadNs != null && _roadNs.Count != 0) || 
+            (_brickNs != null && _brickNs.Count != 0) ||
+            (_walls != null && _walls.Count != 0)) RemoveData();
         // Setting new Data
         _brickNs = new List<BrickN>();
         _roadNs = new List<RoadN>();
+        _walls = new List<GameObject>();
         loadedLevelTextAsset = textLevel.levelText[level];
         loadedPrefab = prefab.prefab;
         GeneratedMatrix = GenerateMap();
